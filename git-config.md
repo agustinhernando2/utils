@@ -30,6 +30,14 @@
 
 ---
 
+## ↩️ Deshaciendo Cambios
+
+* `git reset --hard HEAD`: Descarta todos los cambios no commiteados y regresa al último commit. **¡Cuidado, es destructivo!**
+* `git reset <archivo>`: Quita un archivo del área de staging (pero mantiene los cambios).
+* `git revert <commit-hash>`: Crea un nuevo commit que deshace los cambios de un commit anterior. No reescribe el historial.
+
+---
+
 ## 📦 Trabajar con Múltiples Repositorios (Submódulos)
 
 Los **submódulos Git** permiten incrustar un repositorio Git dentro de otro como un subdirectorio. Esto es útil para gestionar dependencias de proyectos.
@@ -50,13 +58,42 @@ Los **submódulos Git** permiten incrustar un repositorio Git dentro de otro com
 
 ---
 
-## ↩️ Deshaciendo Cambios
+## 📦 Trabajar con Repositorios remotos mediante ssh
 
-* `git reset --hard HEAD`: Descarta todos los cambios no commiteados y regresa al último commit. **¡Cuidado, es destructivo!**
-* `git reset <archivo>`: Quita un archivo del área de staging (pero mantiene los cambios).
-* `git revert <commit-hash>`: Crea un nuevo commit que deshace los cambios de un commit anterior. No reescribe el historial.
+```bash
+╰─➤  sudo cat ~/.ssh/config
 
----
+# Alias para tu cuenta personal de GitHub (clave 1)
+Host **github.com-personal**
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519 # <<-- Tu clave personal
+  IdentitiesOnly yes
+
+# Alias para tu cuenta de empresa en GitHub (clave 2)
+Host **github.com-company**
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_rsa_company # <<-- Tu clave de empresa
+  IdentitiesOnly yes
+```
+
+En tu repositorio Git local:
+```bash
+# Para repositorio personal:
+git remote set-url origin-personal git@**github.com-personal**:tu_usuario_personal/tu_repo_personal.git
+
+# Para repositorio de empresa:
+git remote set-url origin-company git@**github.com-company**:organizacion_empresa/tu_repo_empresa.git
+# verifica la URL del remoto
+git remote -v
+
+# para probar conectividad 
+ssh -T git@github.com-personal
+ssh -vvv git@github.com-personal
+```
+Si no conecta puedes revisar que los permisos del archivo config sean los correctos:
+`-rw-------  1 root        root           231 may 20 17:49 config` es incorrecto porque solo root puede acceder a config.
 
 ## 🔄 GitFlow (Flujo de Trabajo Simplificado)
 
