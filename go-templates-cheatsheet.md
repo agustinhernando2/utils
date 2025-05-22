@@ -23,7 +23,7 @@ La sintaxis de las plantillas de Go se basa en el uso de `{{ }}` para delimitar 
 
 ## 🎯 Operaciones Básicas y Sintaxis
 
-### 1. Acceder a Valores (`{{ .Values.tuValor }}`)
+### Acceder a Valores (`{{ .Values.tuValor }}`)
 
 El objeto más comúnmente utilizado es `.Values`. Contiene todos los valores definidos en tu archivo `values.yaml` y los pasados por línea de comando.
 
@@ -36,3 +36,117 @@ replicaCount: 3
 image:
   repository: myapp
   tag: latest
+```
+
+### **Operador If/Else**
+
+```yaml
+{{ if PIPELINE }}
+  # Do something
+{{ else if OTHER PIPELINE }}
+  # Do something else
+{{ else }}
+  # Default case
+{{ end }}
+```
+
+### **Modifying scope using with**
+```yaml
+  {{- with .Values.favorite }}
+  drink: {{ .drink | default "tea" | quote }}
+  food: {{ .food | upper | quote }}
+  release: {{ $.Release.Name }}  #$ is mapped to the root scope
+  {{- end }}
+```
+
+### **Looping with the range action**
+
+```yaml
+favorite:
+  drink: coffee
+  food: pizza
+pizzaToppings:
+  - mushrooms
+  - cheese
+  - peppers
+  - onions
+  - pineapple
+```
+Utilizando: 
+```yaml
+  toppings: |-
+    {{- range .Values.pizzaToppings }}
+    - {{ . | title | quote }}
+    {{- end }}
+```
+
+Finalmente:
+```yaml
+  toppings: |-
+    - "Mushrooms"
+    - "Cheese"
+    - "Peppers"
+    - "Onions"
+    - "Pineapple"
+```
+
+The ``|-`` marker in YAML takes a multi-line string. This can be a useful technique for embedding big blocks of data inside of your manifests, as exemplified here.
+
+### **Variables**
+
+``{{- $relname := .Release.Name -}}``
+
+```yaml
+ toppings: |-
+    {{- range $index, $topping := .Values.pizzaToppings }}
+      {{ $index }}: {{ $topping }}
+    {{- end }} 
+```
+Finalmente:
+```yaml
+  toppings: |-
+      0: mushrooms
+      1: cheese
+      2: peppers
+      3: onions  
+```
+
+### **Define y template**
+
+[doc](https://helm.sh/docs/chart_template_guide/named_templates/)
+Para reutilizar bloques de codigo
+
+```yaml
+{{- define "mychart.labels" }}
+  labels:
+    generator: helm
+    date: {{ now | htmlDate }}
+{{- end }} 
+```
+Se utiliza llamando con
+```yaml
+{{- template "mychart.labels" }}
+```
+
+### **The include function**
+
+Se considera preferible utilizar la opción de incluir en lugar de plantilla en las plantillas de Helm simplemente para que el formato de salida se pueda manejar mejor para los documentos YAML.
+
+Permite manejas las indentaciones.
+```yaml
+{{ include "mychart.app" . | indent 4 }}
+```
+
+### Notas
+``{{-`` indica que los espacios en blanco deben consumirse a la izquierda.
+``-}}`` significa que los espacios en blanco a la derecha deben consumirse.
+
+ejemplo de mal uso:
+
+```yaml
+  food: {{ .Values.favorite.food | upper | quote }}
+  {{- if eq .Values.favorite.drink "coffee" -}}
+  mug: "true"
+  {{- end -}}
+```
+resultado: ``food: "PIZZA"mug: "true"``
