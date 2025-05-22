@@ -1,3 +1,4 @@
+```bash
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -65,3 +66,4 @@ alias pbcopy='xclip -sel clip'
 alias pbpaste='xclip -sel clip -o'
 alias sshconf='cat ~/.ssh/config'
 alias myip4='curl -4 ifconfig.me'
+```

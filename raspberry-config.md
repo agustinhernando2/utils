@@ -7,7 +7,7 @@ sudo tailscale up --advertise-routes=192.168.100.0/24 --advertise-exit-node
 
 # pi-hole
 http://192.168.100.120/admin
-contr:agustin1304A
+contr:xxx
 
 w para ver dispositivos conectados y carga
 nproc numero de procesadores
